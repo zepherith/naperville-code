@@ -50,4 +50,4 @@ V. Non-Designated Local Highways:
 
 No. 99-40, adopted April 6, 1999; Ord. No. 99-157, adopted September 21, 1999; Ord. No. 01-01, adopted January 2, 2001; Ord. No. 01-203, § 1, adopted October 2, 2001; Ord. No. 03-57, § 1, adopted February 18, 2003, and Ord. No. 04-095, § 1, adopted June 1, 2004.
 
-\* See also Section 11-3-1 of the City Code.
+> \* See also Section 11-3-1 of the City Code.

@@ -1,0 +1,3 @@
+# Titles whose chapter files come from Municode's Word download (tools/municode_word_import.py).
+# tools/municode_import.py leaves these titles' chapter files alone.
+6
