@@ -12,8 +12,8 @@ title's images/ folder) and adds the title to tools/word-titles.txt, so that lat
 runs of tools/municode_import.py leave those chapters alone. Re-run this script with
 a fresh download to update the title.
 
-If the download includes Municode's Supplement History Table or Code Comparative Table,
-they are written to Tables/, and the latest supplement in the history table is saved to
+If the download includes Municode's Supplement History Table, Code Comparative Table or
+the ordinance that adopted the code, they are written to Tables/, and the latest supplement in the history table is saved to
 tools/word-edition.txt and named in each file's current_through.
 """
 import collections
@@ -229,6 +229,18 @@ def write_table(name, title, md, retrieved):
     return body
 
 
+def write_ordinance(num, md, retrieved):
+    """Write the ordinance that adopted the code (Ord. No. 85-10) to Tables/."""
+    body = re.sub(r"\n{3,}", "\n\n", md).strip()
+    out = ["---", f"citation: Naperville Ord. No. {num}", f"source: {SOURCE}",
+           f"current_through: {EDITION + ', ' if EDITION else ''}Municode online edition as downloaded {retrieved}",
+           f"retrieved: {retrieved}", "---", "", f"# Ordinance No. {num}", "", body]
+    os.makedirs(TABLES, exist_ok=True)
+    with open(os.path.join(TABLES, f"Adopting-Ordinance-{num}.md"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(out) + "\n")
+    print(f"Ordinance No. {num} written to Tables/")
+
+
 def main(argv):
     global EDITION
     if len(argv) != 2:
@@ -251,6 +263,10 @@ def main(argv):
                 fh.write(EDITION + "\n")
             write_table("Supplement-History.md", "Supplement History Table", hist.group(1), retrieved)
             md = md[:hist.start()] + md[hist.end():]
+        # The download of the code's front matter carries the ordinance that adopted the code.
+        adopt = re.search(r"(?ms)^\*\*ORDINANCE NO\. ([\d-]+)\*\*\s*$(.*?AN ORDINANCE ADOPTING.*?)(?=^# |\Z)", md)
+        if adopt:
+            write_ordinance(adopt.group(1), adopt.group(2), retrieved)
         # Municode's back matter (Code Comparative Table, Index) follows the last title.
         md, *back = re.split(r"(?m)^(?=# (?:CODE COMPARATIVE TABLE|INDEX)\b)", md)
         for b in back:
