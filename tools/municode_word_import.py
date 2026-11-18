@@ -54,9 +54,10 @@ def split(md, title):
     md = re.sub(r"(?m)^\[\^\w+\]:.*$", "", md)
     chapters, cur = collections.OrderedDict(), None
     for line in md.split("\n"):
-        m = re.match(r"^## CHAPTER (\d+(?:\.\d+)?)\s*\*\*(.+?)\*\*(.*)$", line)
+        # The name is usually bold ("## CHAPTER 1 **OFFICIAL MUNICIPAL CODE**"), but not always.
+        m = re.match(r"^## CHAPTER (\d+(?:\.\d+)?)\s+(?:\*\*(.+?)\*\*|(.+?))((?:\[\^\w+\])*)\s*$", line)
         if m:
-            cur = {"n": m.group(1), "name": squash(m.group(2)), "extra": m.group(3).strip(), "lines": []}
+            cur = {"n": m.group(1), "name": squash(m.group(2) or m.group(3)), "extra": m.group(4).strip(), "lines": []}
             chapters[cur["n"]] = cur
             continue
         if cur is not None:
