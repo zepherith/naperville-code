@@ -11,6 +11,10 @@ Needs pandoc. The script writes the title's chapter files (and any figures, into
 title's images/ folder) and adds the title to tools/word-titles.txt, so that later
 runs of tools/municode_import.py leave those chapters alone. Re-run this script with
 a fresh download to update the title.
+
+If the download includes Municode's Supplement History Table, Code Comparative Table or
+the ordinance that adopted the code, they are written to Tables/, and the latest supplement in the history table is saved to
+tools/word-edition.txt and named in each file's current_through.
 """
 import collections
 import glob
@@ -25,6 +29,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from municode_import import ROOT, SOURCE, padded, slug, squash, title_case  # noqa: E402
 
 WORD_TITLES = os.path.join(ROOT, "tools", "word-titles.txt")
+WORD_EDITION = os.path.join(ROOT, "tools", "word-edition.txt")
+TABLES = os.path.join(ROOT, "Tables")
+EDITION = ""  # e.g. "Supplement No. 101 (Ord. 26-049)", read from the Supplement History Table
 
 
 def convert(docx, media):
@@ -88,7 +95,7 @@ def render(title, ch, notes, images, retrieved):
         "---",
         f"citation: Naperville Municipal Code {num}",
         f"source: {SOURCE}",
-        f"current_through: Municode online edition as downloaded {retrieved}",
+        f"current_through: {EDITION + ', ' if EDITION else ''}Municode online edition as downloaded {retrieved}",
         f"retrieved: {retrieved}",
         "---",
         "",
@@ -195,15 +202,76 @@ def import_title(title, tname, md, notes, retrieved):
           + (f"; no sections in {', '.join(skipped)}" if skipped else ""))
 
 
+def table_rows(html):
+    """The cells of each row of the HTML tables in html, as plain text."""
+    rows = []
+    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S):
+        cells = [squash(re.sub(r"<[^>]+>", " ", c)) for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", tr, re.S)]
+        rows.append([re.sub(r"(\d+)-\s+(\d+)-", r"\1-\2-", c).replace("|", "\\|") for c in cells])
+    return rows
+
+
+def write_table(name, title, md, retrieved):
+    """Write one of Municode's back-matter tables as a Markdown table in Tables/."""
+    intro = [squash(p) for p in re.split(r"\n\s*\n", md.split("<table", 1)[0]) if p.strip() and not p.startswith("#")]
+    rows = [r for r in table_rows(md) if any(r)]
+    head, body = rows[0], rows[1:]
+    out = ["---", f"citation: Naperville Municipal Code, {title}", f"source: {SOURCE}",
+           f"current_through: {EDITION + ', ' if EDITION else ''}Municode online edition as downloaded {retrieved}",
+           f"retrieved: {retrieved}", "---", "", f"# {title}", ""]
+    out += [p + "\n" for p in intro]
+    out += ["| " + " | ".join(head) + " |", "|" + " --- |" * len(head)]
+    out += ["| " + " | ".join(r + [""] * (len(head) - len(r))) + " |" for r in body]
+    os.makedirs(TABLES, exist_ok=True)
+    with open(os.path.join(TABLES, name), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(out) + "\n")
+    print(f"{title}: {len(body)} rows")
+    return body
+
+
+def write_ordinance(num, md, retrieved):
+    """Write the ordinance that adopted the code (Ord. No. 85-10) to Tables/."""
+    body = re.sub(r"\n{3,}", "\n\n", md).strip()
+    out = ["---", f"citation: Naperville Ord. No. {num}", f"source: {SOURCE}",
+           f"current_through: {EDITION + ', ' if EDITION else ''}Municode online edition as downloaded {retrieved}",
+           f"retrieved: {retrieved}", "---", "", f"# Ordinance No. {num}", "", body]
+    os.makedirs(TABLES, exist_ok=True)
+    with open(os.path.join(TABLES, f"Adopting-Ordinance-{num}.md"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(out) + "\n")
+    print(f"Ordinance No. {num} written to Tables/")
+
+
 def main(argv):
+    global EDITION
     if len(argv) != 2:
         sys.exit(__doc__)
     docx, retrieved = argv
     done = []
     with tempfile.TemporaryDirectory() as tmp:
         md = tidy_tables(convert(docx, tmp))
+        if os.path.exists(WORD_EDITION):
+            EDITION = open(WORD_EDITION).read().strip()
+        # A download may open with Municode's Supplement History Table. Its latest supplement
+        # dates the online text, and the table is kept in Tables/.
+        hist = re.search(r"(?ms)^#\s+SUPPLEMENT HISTORY TABLE\s*$(.*?)(?=^# )", md)
+        if hist:
+            rows = [r for r in table_rows(hist.group(1)) if len(r) == 4 and r[3].isdigit()]
+            supp = max(int(r[3]) for r in rows)
+            last = [r for r in rows if int(r[3]) == supp][-1]
+            EDITION = f"Supplement No. {supp} (Ord. {last[0]})"
+            with open(WORD_EDITION, "w") as fh:
+                fh.write(EDITION + "\n")
+            write_table("Supplement-History.md", "Supplement History Table", hist.group(1), retrieved)
+            md = md[:hist.start()] + md[hist.end():]
+        # The download of the code's front matter carries the ordinance that adopted the code.
+        adopt = re.search(r"(?ms)^\*\*ORDINANCE NO\. ([\d-]+)\*\*\s*$(.*?AN ORDINANCE ADOPTING.*?)(?=^# |\Z)", md)
+        if adopt:
+            write_ordinance(adopt.group(1), adopt.group(2), retrieved)
         # Municode's back matter (Code Comparative Table, Index) follows the last title.
-        md = re.split(r"(?m)^# (?:CODE COMPARATIVE TABLE|INDEX)\b", md)[0]
+        md, *back = re.split(r"(?m)^(?=# (?:CODE COMPARATIVE TABLE|INDEX)\b)", md)
+        for b in back:
+            if b.startswith("# CODE COMPARATIVE TABLE"):
+                write_table("Code-Comparative-Table.md", "Code Comparative Table", b.split("\n", 1)[1], retrieved)
         # Footnote numbers run through the whole download, so read them once.
         notes = dict(re.findall(r"(?m)^\[\^(\w+)\]:\s*(.*)$", md))
         # A download can hold one title or several, each opening with "# TITLE n  NAME".
