@@ -573,6 +573,10 @@ def render_schedule(tag, lines, meta, retrieved, name=None):
     return header(f"Naperville Municipal Code 11-1-5, Schedule {tag}", meta, retrieved) + f"# 11-1-5 {title}\n\n" + body + "\n", name
 
 
+# Titles whose pages in Municode's PDF (Supplement 100) are all digital text, none scanned.
+DIGITAL_TITLES = {2}
+
+
 def strip_dates(text):
     return re.sub(r"^(current_through|retrieved): .*$", "", text, flags=re.M)
 
@@ -642,6 +646,8 @@ def main(argv):
             if t not in word:  # titles taken from Municode's Word download are left alone
                 write(os.path.join(ROOT, rel), render_chapter(ch, meta, retrieved, links), stats)
             toc.insert(len(toc) - len(links), f"| [{num}]({rel}) | {title_case(ch['name'])} |")
+    pdf_titles = set(meta["titles"]) - word
+    pdf_label = ("Title " if len(pdf_titles) == 1 else "Titles ") + ", ".join(str(t) for t in sorted(pdf_titles))
     readme = [
         "# Naperville Municipal Code",
         "",
@@ -656,8 +662,8 @@ def main(argv):
         ("- **Word downloads:** Title" + ("s " if len(word) > 1 else " ") + ", ".join(str(w) for w in sorted(word))
          + " come" + ("" if len(word) > 1 else "s") + " from Municode's online text, downloaded as Word, which is born-digital, so it has no OCR errors. Its files say so in `current_through`, keep Municode's tables and footnotes, and show its figures from the title's `images/` folder. To update "
          + ("them" if len(word) > 1 else "it") + ", run `tools/municode_word_import.py <file> <date downloaded>` on a fresh download.") if word else None,
-        "- **How the text was made:** " + ("the other titles were" if word else "it was") + " extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.",
-        "- **Scanned pages:** many pages of Municode's PDF are scans of the 2010 printing with a machine-read (OCR) text layer, so some words in this copy may be misread. Where a passage matters, check it against the official code.",
+        "- **How the text was made:** " + (pdf_label + " " + ("was" if len(pdf_titles) == 1 else "were") if word else "it was") + " extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.",
+        None if not pdf_titles - DIGITAL_TITLES else "- **Scanned pages:** many pages of Municode's PDF are scans of the 2010 printing with a machine-read (OCR) text layer, so some words in this copy may be misread. Where a passage matters, check it against the official code.",
         "- **Updating:** download the full code from Municode as a PDF and run `tools/municode_import.py <file> <date downloaded>` (needs `pdftotext`). It rewrites only the chapters whose text changed and this page.",
         "",
         "## Contents",

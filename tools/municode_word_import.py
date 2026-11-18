@@ -98,6 +98,59 @@ def render(title, ch, notes, images, retrieved):
     ]) + foot + "\n"
 
 
+ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50}
+
+
+def roman(s):
+    total = 0
+    for i, c in enumerate(s):
+        v = ROMAN[c]
+        total += -v if i + 1 < len(s) and ROMAN[s[i + 1]] > v else v
+    return total
+
+
+def split_schedules(ch):
+    """Take the traffic schedules of 11-1-5 out of Chapter 11-1, one list of lines per schedule.
+
+    The schedules run from the first "SCHEDULE I/..." line to the heading of 11-1-6. Part
+    headings ("# Sch. IA: ...", "# Sch. VIIC-1: ...") belong to the schedule of their numeral.
+    Their place in the chapter takes a list of links to the schedule files.
+    """
+    lines = ch["lines"]
+    start = next((i for i, l in enumerate(lines) if re.match(r"^SCHEDULE I\s*/", l)), None)
+    end = next((i for i, l in enumerate(lines) if re.match(r"^# 11-1-6:", l)), None)
+    if start is None or end is None:
+        return collections.OrderedDict(), {}
+    names = {}
+    for l in lines[:start]:
+        m = re.match(r"^\|\s*(\S.*?)\s*\|\s*Schedule ([IVXL]+)\s*\|", l)
+        if m:
+            names[m.group(2)] = m.group(1)
+    schedules, cur = collections.OrderedDict(), None
+    for l in lines[start:end]:
+        m = (re.match(r"^SCHEDULE ([IVXL]+)\s*/", l)
+             or re.match(r"^# Sch\. ([IVXL]+?)(?:[A-H](?:-\d+)?)?:", l))
+        if m and m.group(1) != cur:
+            cur = m.group(1)
+            schedules[cur] = []
+        if re.match(r"^SCHEDULE [IVXL]+\s*/", l):
+            continue  # the schedule's own title line; the file's heading says it
+        schedules[cur].append(l)
+    links = ["**Traffic schedules (Section 11-1-5).** Each schedule is kept in its own file:", ""]
+    links += [f"- [Schedule {r}: {names.get(r, '')}](11-01-Schedules/Sch-{roman(r):02d}.md)".replace(": ]", "]")
+              for r in schedules]
+    ch["lines"] = lines[:start] + links + [""] + lines[end:]
+    return schedules, names
+
+
+def render_schedule(r, name, lines, notes, images, retrieved):
+    ch = {"n": "1", "name": "", "extra": "", "lines": lines}
+    text = render(11, ch, notes, images, retrieved)
+    label = f"Schedule {r}" + (f": {name}" if name else "")
+    text = text.replace("citation: Naperville Municipal Code 11-1\n", f"citation: Naperville Municipal Code 11-1-5, Schedule {r}\n", 1)
+    return text.replace("\n# 11-1 \n", f"\n# 11-1-5 {label}\n", 1)
+
+
 def import_title(title, tname, md, notes, retrieved):
     folder = os.path.join(ROOT, f"Title-{title:02d}-{slug(tname)}")
     os.makedirs(folder, exist_ok=True)
@@ -119,6 +172,17 @@ def import_title(title, tname, md, notes, retrieved):
             images[src] = f"images/{name}"
     chapters, _ = split(md, title)
     written, skipped = 0, []
+    if title == 11 and "1" in chapters:
+        schedules, names = split_schedules(chapters["1"])
+        sdir = os.path.join(folder, "11-01-Schedules")
+        if schedules:
+            os.makedirs(sdir, exist_ok=True)
+            for old in glob.glob(os.path.join(sdir, "Sch-*.md")):
+                os.remove(old)
+        for r, ls in schedules.items():
+            with open(os.path.join(sdir, f"Sch-{roman(r):02d}.md"), "w", encoding="utf-8") as fh:
+                fh.write(render_schedule(r, names.get(r), ls, notes, images, retrieved))
+        print(f"Title 11: {len(schedules)} traffic schedule files")
     for n, ch in chapters.items():
         if not any(re.match(r"^# \d", l) for l in ch["lines"]):
             skipped.append(f"{title}-{n}")
@@ -138,6 +202,8 @@ def main(argv):
     done = []
     with tempfile.TemporaryDirectory() as tmp:
         md = tidy_tables(convert(docx, tmp))
+        # Municode's back matter (Code Comparative Table, Index) follows the last title.
+        md = re.split(r"(?m)^# (?:CODE COMPARATIVE TABLE|INDEX)\b", md)[0]
         # Footnote numbers run through the whole download, so read them once.
         notes = dict(re.findall(r"(?m)^\[\^(\w+)\]:\s*(.*)$", md))
         # A download can hold one title or several, each opening with "# TITLE n  NAME".

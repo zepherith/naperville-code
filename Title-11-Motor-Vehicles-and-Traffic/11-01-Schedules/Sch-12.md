@@ -1,146 +1,48 @@
 ---
 citation: Naperville Municipal Code 11-1-5, Schedule XII
 source: https://library.municode.com/il/naperville/codes/code_of_ordinances
-current_through: Supplement No. 100 (Ord. 26-040)
+current_through: Municode online edition as downloaded 2026-11-18
 retrieved: 2026-11-18
 ---
 
 # 11-1-5 Schedule XII: Tow Away Zones
 
-```text
-Sch. XII:           TOW AWAY ZONES:
-```
+### Sch. XII: TOW AWAY ZONES:
 
-SCHEDULE XII/TOW AWAY ZONES
+| SCHEDULE XII/TOW AWAY ZONES                    |                                                                                                                                                                                                       |                 |                |
+|------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|----------------|
+| <u>Street</u>                                  | <u>Area Of Restriction</u>                                                                                                                                                                            | <u>Side</u>     | <u>Ord. \#</u> |
+| BURLINGTON COMMUTER PARKING LOT                | Lot spaces 1—15                                                                                                                                                                                       |                 | 90-72          |
+| BURLINGTON LOT                                 | Southeast corner of Washington St. and Fifth Ave. north of the Burlington Northern Railroad tracks. Vehicles without permits located in the lot from 6:00 a.m.—6:00 p.m. Monday—Friday shall be towed |                 | 89-155         |
+| COUNTRY FARM DR.                               | From Fisher Dr. to northern terminus of Country Farm Dr., semitrailers                                                                                                                                | Both            | 01-107         |
+| FRANKLIN AVE.                                  | From a point 80' east of the centerline of Main St. to a point 80' west of the centerline of Main St.                                                                                                 | South           | 21-127         |
+| FRANKLIN AVE.                                  | From the centerline of Washington St. to a point 80' west of the centerline of Washington St.                                                                                                         | North           | 21-127         |
+| FRANKLIN AVE.                                  | From a point 230' west of the centerline of Washington St. to a point 80' west of the centerline of Webster St.                                                                                       | North           | 21-127         |
+| FRANKLIN AVE.                                  | From the centerline of Washington St. to a point 280' west of the centerline of Washington Street                                                                                                     | South           | 21-127         |
+| FRANKLIN AVE.                                  | From a point 80' east of the centerline of Webster St. to a point 80' west of the centerline of Webster St.                                                                                           | South           | 21-127         |
+| FRONTENAC RD.                                  | From North Aurora Rd. to Diehl Rd.                                                                                                                                                                    | East            | 97-55          |
+| FRONTENAC RD.                                  | From Diehl Rd. to North Aurora Rd., semitrailers                                                                                                                                                      | Both            | 00-148         |
+| GOLFVIEW RD.                                   | From Frontenac Rd. to Shore Rd., semitrailers                                                                                                                                                         | Both            | 00-148         |
+| GOLFVIEW RD.                                   | From Shore Rd. to Frontenac Rd.                                                                                                                                                                       | Both            | 97-17          |
+| ILLINOIS ROUTE 59 COMMUTER STATION PARKING LOT | In its entirety                                                                                                                                                                                       |                 | 90-51          |
+| JACKSON AVE.                                   | For 3 parking spaces located in front of the trash compactor, from a point 236' west of the centerline of Washington St. to a point 199' west of the centerline of Washington St.                     | South           | 01-154         |
+| JACKSON AVE.                                   | From West St. to the western terminus of Jackson Ave.                                                                                                                                                 | North           | 04-148         |
+| KROEHLER LOT                                   | Northeast corner of Fifth Ave. and Loomis St., vehicles without permits located in the lot from 6:00 a.m.—6:00 p.m. Monday—Friday shall be towed                                                      |                 | 89-155         |
+| MAIN ST.                                       | From the centerline of Benton Ave. to a point 80' north of the centerline of Benton Ave.                                                                                                              | Both            | 21-127         |
+| SHORE RD.                                      | From Frontenac Rd. to Diehl Rd.                                                                                                                                                                       | West            | 97-55          |
+| SHORE RD.                                      | From Frontenac Rd. to Diehl Rd., semitrailers                                                                                                                                                         | Both            | 00-148         |
+| WASHINGTON ST.                                 | From a point 170' south of Benton Ave. to a point 85' north of Van Buren Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                       | East            | 92-210         |
+| WASHINGTON ST.                                 | From a point 240' south of Benton Ave. to a point 280' south of Benton Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                         | West            | 92-210         |
+| WASHINGTON ST.                                 | From a point 135' south of Jefferson Ave. to a point 75' north of Jackson Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                      | East            | 92-210         |
+| WASHINGTON ST.                                 | From a point 65' south of Jefferson Ave. to a point 175' south of Jefferson Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                    | West            | 92-210         |
+| WASHINGTON ST.                                 | From a point 225' south of Jefferson Ave. to a point 265' south of Jefferson Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                   | West            | 92-210         |
+| WASHINGTON ST.                                 | From a point 50' south of Van Buren Ave. to a point 80' north of Jefferson Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                     | East            | 92-210         |
+| WASHINGTON ST.                                 | From a point 100' south of the centerline of Van Buren Ave. to a point 200' south of Van Buren Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m., Monday—Friday                                                  | West            | 04-169         |
+| WASHINGTON ST.                                 | From a point 220' south of Van Buren Ave. to a point 135' north of Jefferson Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.                                                                                   | West            | 92-210         |
+| FOURTH AVE.                                    | From a point 60' west of Ellsworth St. to a point 280' west of Ellsworth St.                                                                                                                          | North of island | 92-76          |
+| FOURTH AVE.                                    | From a point 100' west of Ellsworth St. to a point 280' west of Ellsworth St.                                                                                                                         | South of island | 92-76          |
+| FOURTH AVE.                                    | From a point 220' east of Ellsworth St. to Loomis St.                                                                                                                                                 | North           | 92-76          |
+| FOURTH AVE.                                    | From a point 220' east of Ellsworth St. to a point 80' west of Loomis St. 6:00 a.m.—8:30 a.m. and 4:30 p.m.—6:30 p.m. Monday—Friday                                                                   | South           | 25-056         |
+|                                                |                                                                                                                                                                                                       |                 |                |
 
-```text
-Street                 Area Of Restriction                                        Side            Ord. #
-```
-
-BURLINGTON COM-
-
-```text
-   MUTER PARKING LOT   Lot spaces 1—15                                                            90-72
-BURLINGTON LOT                Southeast corner of Washington St. and Fifth                        89-155
-```
-
-Ave. north of the Burlington Northern Railroad tracks. Vehicles without permits located in the lot from 6:00 a.m.—6:00 p.m. Monday—Friday shall be towed
-
-```text
-COUNTRY FARM DR.              From Fisher Dr. to northern terminus of Country     Both            01-107
-                                 Farm Dr., semitrailers
-FRANKLIN AVE.                 From a point 80' east of the centerline of Main     South           21-127
-```
-
-St. to a point 80' west of the centerline of Main St.
-
-```text
-FRANKLIN AVE.                 From the centerline of Washington St. to a point    North           21-127
-                                 80' west of the centerline of Washington St.
-FRANKLIN AVE.                 From a point 230' west of the centerline of         North           21-127
-```
-
-Washington St. to a point 80' west of the centerline of Webster St.
-
-```text
-FRANKLIN AVE.                 From the centerline of Washington St. to a point    South           21-127
-```
-
-280' west of the centerline of Washington Street
-
-```text
-FRANKLIN AVE.                 From a point 80' east of the centerline of          South           21-127
-```
-
-Webster St. to a point 80' west of the
-
-```text
-FRONTENAC RD.                 From North Aurora Rd. to Diehl Rd.                  East            97-55
-FRONTENAC RD.                 From Diehl Rd. to North Aurora Rd., semitrailers    Both            00-148
-GOLFVIEW RD.                  From Frontenac Rd. to Shore Rd., semitrailers       Both            00-148
-GOLFVIEW RD.                  From Shore Rd. to Frontenac Rd.                     Both            97-17
-ILLINOIS ROUTE 59 COM-        In its entirety                                                     90-51
-```
-
-MUTER STATION PARKING LOT
-
-```text
-JACKSON AVE.                  For 3 parking spaces located in front of the        South           01-154
-```
-
-trash compactor, from a point 236' west of the centerline of Washington St. to a point 199' west of the centerline of Washington St.
-
-```text
-JACKSON AVE.                  From West St. to the western terminus of Jack-      North           04-148
-                                son Ave.
-KROEHLER LOT                  Northeast corner of Fifth Ave. and Loomis St.,                      89-155
-```
-
-vehicles without permits located in the lot from 6:00 a.m.—6:00 p.m. Monday—Friday shall be towed
-
-```text
-MAIN ST.                      From the centerline of Benton Ave. to a point 80'   Both            21-127
-                                north of the centerline of Benton Ave.
-SHORE RD.                     From Frontenac Rd. to Diehl Rd.                     West            97-55
-SHORE RD.                     From Frontenac Rd. to Diehl Rd., semitrailers       Both            00-148
-   MUTER PARKING LOT   Lot spaces 1—15                                                               90-72
-WASHINGTON ST.                  From a point 170' south of Benton Ave. to a          East            92-210
-```
-
-point 85' north of Van Buren Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m.
-
-```text
-WASHINGTON ST.                  From a point 240' south of Benton Ave. to a          West            92-210
-```
-
-point 280' south of Benton Ave. 6:00—8:30
-
-```text
-WASHINGTON ST.                  From a point 135' south of Jefferson Ave. to a       East            92-210
-```
-
-point 75' north of Jackson Ave. 6:00—8:30
-
-```text
-WASHINGTON ST.                  From a point 65' south of Jefferson Ave. to a        West            92-210
-```
-
-point 175' south of Jefferson Ave. 6:00—8:30
-
-```text
-WASHINGTON ST.                  From a point 225' south of Jefferson Ave. to a       West            92-210
-```
-
-point 265' south of Jefferson Ave. 6:00—8:30
-
-```text
-WASHINGTON ST.                  From a point 50' south of Van Buren Ave. to a        East            92-210
-```
-
-point 80' north of Jefferson Ave. 6:00—8:30
-
-```text
-WASHINGTON ST.                  From a point 100' south of the centerline of Van     West            04-169
-```
-
-Buren Ave. to a point 200' south of Van Buren Ave. 6:00—8:30 a.m. and 4:00—7:00 p.m., Monday—Friday
-
-```text
-WASHINGTON ST.                  From a point 220' south of Van Buren Ave. to a       West            92-210
-```
-
-point 135' north of Jefferson Ave. 6:00—8:30
-
-```text
-FOURTH AVE.                     From a point 60' west of Ellsworth St. to a point    North of        92-76
-                                  280' west of Ellsworth St.                           island
-FOURTH AVE.                     From a point 100' west of Ellsworth St. to a         South of        92-76
-                                  point 280' west of Ellsworth St.                     island
-FOURTH AVE.                     From a point 220' east of Ellsworth St. to           North           92-76
-                                  Loomis St.
-FOURTH AVE.                     From a point 220' east of Ellsworth St. to a point   South           25-056
-```
-
-80' west of Loomis St. 6:00 a.m.—8:30 a.m. and 4:30 p.m.—6:30 p.m. Monday—Friday (Ord. No. 01-224, § 1, 11-20-2001; Ord. No. 04-147, § 2, 9-7-2004; Ord. No. 04-148, § 1, 9-7-2004; Ord. No.
-
-04-169, § 2, 10-5-2004; Ord. No. 12-107, § 2, 8-21-2012; Ord. No. 21-127, § 1, 12-7-2021; Ord. No. 25-056, §§ 11, 23, 6-17-2025; Ord. No. 25-100, § 2, 9-16-2025; Ord. No. 25-101, § 2, 9-16-2025)
+(Ord. No. 01-224, § 1, 11-20-2001; Ord. No. 04-147, § 2, 9-7-2004; Ord. No. 04-148, § 1, 9-7-2004; Ord. No. 04-169, § 2, 10-5-2004; Ord. No. 12-107, § 2, 8-21-2012; Ord. No. 21-127, § 1, 12-7-2021; Ord. No. 25-056, §§ 11, 23, 6-17-2025; Ord. No. 25-100, § 2, 9-16-2025; Ord. No. 25-101, § 2, 9-16-2025)

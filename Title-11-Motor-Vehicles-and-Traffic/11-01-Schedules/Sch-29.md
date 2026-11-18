@@ -1,17 +1,13 @@
 ---
 citation: Naperville Municipal Code 11-1-5, Schedule XXIX
 source: https://library.municode.com/il/naperville/codes/code_of_ordinances
-current_through: Supplement No. 100 (Ord. 26-040)
+current_through: Municode online edition as downloaded 2026-11-18
 retrieved: 2026-11-18
 ---
 
 # 11-1-5 Schedule XXIX: Traffic Calming Locations
 
-SCHEDULE XXIX/TRAFFIC CALMING LOCATIONS
-
-```text
-Sch. XXIXA:         TRAFFIC CIRCLES:
-```
+### Sch. XXIXA: TRAFFIC CIRCLES:
 
 Breckinridge Ln. and Cheyenne Dr.
 
