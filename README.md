@@ -8,7 +8,8 @@ An unofficial copy of the Municipal Code of the City of Naperville, Illinois, ke
 - **Layout:** one folder per title and one file per chapter. Chapter numbers are padded with zeros so files sort in order (`1-09.md` is Chapter 1-9, and `8-00.5.md` is Chapter 8-0.5). Lettered parts of a chapter (Article 6A, Chapter 9A and so on) are headings inside the chapter's file.
 - **Traffic schedules:** the 31 schedules of Section 11-1-5 are kept one per file in `Title-11-Motor-Vehicles-and-Traffic/11-01-Schedules/`, because together they run about 260 pages.
 - **Each file** starts with its citation, source, the supplement it reflects and the date the text was downloaded.
-- **How the text was made:** it was extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.
+- **Word downloads:** Title 6 comes from Municode's online text, downloaded as Word, which is born-digital, so it has no OCR errors. Its files say so in `current_through`, keep Municode's tables and footnotes, and show its figures from the title's `images/` folder. To update it, run `tools/municode_word_import.py <file> <date downloaded>` on a fresh download.
+- **How the text was made:** the other titles were extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.
 - **Scanned pages:** many pages of Municode's PDF are scans of the 2010 printing with a machine-read (OCR) text layer, so some words in this copy may be misread. Where a passage matters, check it against the official code.
 - **Updating:** download the full code from Municode as a PDF and run `tools/municode_import.py <file> <date downloaded>` (needs `pdftotext`). It rewrites only the chapters whose text changed and this page.
 
@@ -77,7 +78,7 @@ An unofficial copy of the Municipal Code of the City of Naperville, Illinois, ke
 | [3-14](Title-03-Business-and-License-Regulations/3-14.md) | Taxpayers' Bill of Rights |
 | [3-15](Title-03-Business-and-License-Regulations/3-15.md) | Pedicab Regulations |
 | [3-16](Title-03-Business-and-License-Regulations/3-16.md) | Commercial Quadricylces |
-| 3-17 | Reserved (no file: former chapter repealed by Ord. 20-088, August 18, 2020) |
+| 3-17 | Reserved (no file) |
 | [3-18](Title-03-Business-and-License-Regulations/3-18.md) | Short-term Residential Rentals* |
 | [3-19](Title-03-Business-and-License-Regulations/3-19.md) | Regulation of the Commercial Sale of Assault Rifles* |
 | [3-20](Title-03-Business-and-License-Regulations/3-20.md) | Massage Establishments* |
@@ -104,7 +105,7 @@ An unofficial copy of the Municipal Code of the City of Naperville, Illinois, ke
 | [5-1](Title-05-Building-Regulations/5-01.md) | Building Codes |
 | [5-2](Title-05-Building-Regulations/5-02.md) | Construction and Fire Prevention Regulations |
 | 5-3 | Dangerous Buildings (no file: repealed by Ord. 02-31, 2-19-2002, eff. 4-8-2002) |
-| 5-4 | Reserved (no file: former chapter repealed by Ord. 17-006, January 17, 2017) |
+| 5-4 | Reserved (no file) |
 | 5-5 | Swimming Pools (no file: repealed by Ord. 02-31, 2-19-2002, eff. 4-8-2002) |
 | [5-6](Title-05-Building-Regulations/5-06.md) | Flood Hazard Areas |
 | [5-7](Title-05-Building-Regulations/5-07.md) | Storm Runoff Control |
@@ -171,7 +172,7 @@ An unofficial copy of the Municipal Code of the City of Naperville, Illinois, ke
 | [10-2](Title-10-Police-Regulations/10-02.md) | General Offenses |
 | [10-3](Title-10-Police-Regulations/10-03.md) | Minors* |
 | [10-4](Title-10-Police-Regulations/10-04.md) | Animal Control |
-| 10-5 | Reserved (no file: former chapter repealed by Ord. 20-143, December 15, 2020) |
+| 10-5 | Reserved (no file) |
 | [10-6](Title-10-Police-Regulations/10-06.md) | Public Safety Emergency Response Alarm System |
 | [10-7](Title-10-Police-Regulations/10-07.md) | Fireworks; Explosives |
 | [10-8](Title-10-Police-Regulations/10-08.md) | Administrative Fees* |

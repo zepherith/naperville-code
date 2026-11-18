@@ -78,7 +78,10 @@ def fix_spacing(s):
     """Close the stray spaces the PDF prints before punctuation."""
     s = re.sub(r"(\S) +([,;:])(?=\s|$)", r"\1\2", s)
     s = re.sub(r"([A-Za-z0-9)]) +\.(?=\s|$|,)", r"\1.", s)
-    s = re.sub(r"(\d) \.(\d)", r"\1.\2", s)  # "6-6A-3 .7.1", "$50,000 .00"
+    s = re.sub(r"(\d) \.(\d)", r"\1.\2", s)
+    s = re.sub(r"(\d) ,(\d{3})\b", r"\1,\2", s)  # "$10 ,000.00"
+    s = re.sub(r"(\d) %", r"\1%", s)
+    s = re.sub(r"\b(\d+-\d+) ([A-Z]-\d)", r"\1\2", s)  # "8-1 C-6"  # "6-6A-3 .7.1", "$50,000 .00"
     s = re.sub(r"\b(\d{1,2}-\d{1,2}) -(\d{2,4})\b", r"\1-\2", s)  # "1-21 -1980"
     s = re.sub(r"\( +", "(", s)
     s = re.sub(r" +\)", ")", s)
@@ -97,6 +100,11 @@ def md_escape(s):
     s = re.sub(r"^(\d+)\.(\s|$)", r"\1\\.\2", s)
     s = re.sub(r"^([-+#>|=])", r"\\\1", s)
     return s
+
+
+# "CODE:        The Municipal Code of ..." -- a defined term and its definition set in two columns
+DEFINITION = re.compile(r"^\s*([A-Z][A-Z0-9 ,'’/()&.\-]{1,60}):\s{3,}(\S.*)$")
+LEADERS = re.compile(r"(?:\s?\.){5,}\s*")
 
 
 def tabular(line):
@@ -125,6 +133,40 @@ def front_matter(pages):
         "supplement": sup.group(1), "supplement_date": sup.group(2),
         "ordinance": ords.group(1), "adopted": ords.group(2), "titles": titles,
     }
+
+
+FOOTNOTE = re.compile(r"^\s*(\*{1,3}|†{1,2}|‡|t{1,2}(?= See\b))\s?(\S.*)$")
+
+
+def pull_footnotes(lines):
+    """Take the footnotes printed at the foot of a page out of its text.
+
+    They start with *, ** or a dagger (the OCR often reads a dagger as "t") and sit
+    below the last line of text. Returns them and removes them from `lines`.
+    """
+    nonblank = [i for i, l in enumerate(lines) if l.strip()]
+    start = None
+    for i in reversed(nonblank[-6:]):
+        if FOOTNOTE.match(lines[i]):
+            start = i
+        elif start is None:
+            # a wrapped footnote line below its marker line
+            continue
+    if start is None:
+        return []
+    block = lines[start:]
+    if not all(FOOTNOTE.match(l) or not l.strip() or len(l.strip()) < 120 for l in block):
+        return []
+    notes = []
+    for l in block:
+        if not l.strip():
+            continue
+        if FOOTNOTE.match(l) or not notes:
+            notes.append(squash(l))
+        else:
+            notes[-1] += " " + squash(l)
+    del lines[start:]
+    return [re.sub(r"^t{1,2}(?= See)", lambda m: "†" * len(m.group(0)), n) for n in notes]
 
 
 def body_pages(pages):
@@ -178,6 +220,7 @@ def body_pages(pages):
             title, started = (ok[-1] if fm and int(fm.group(1)) in ok else ok[0]), True
         elif not started:
             continue  # preface, adopting ordinance, supplement history, checklist
+        lines = lines + [("note", n) for n in pull_footnotes(lines)]
         pid = PAGE_ID.search(tail)
         PAGES_SEEN.append((number, title, header))
         yield title, pid.group(2) if pid else "?", header, lines
@@ -200,6 +243,11 @@ def split_chapters(pages):
         i = 0
         while i < len(lines):
             l = lines[i]
+            if isinstance(l, tuple):  # a footnote from the foot of the page
+                if cur is not None:
+                    (cur["schedules"].setdefault(tag, []) if tag else cur["lines"]).append(l)
+                i += 1
+                continue
             m = re.match(r"^\s*CHAPTER ?(\d+(?:\.\d+)?)([A-Z]?)\s*$", l)
             if m:
                 n, part = m.group(1), m.group(2)
@@ -259,6 +307,9 @@ def clean_lines(raw):
     """Drop page markers and the blank runs around page breaks; mark breaks as soft."""
     out = []
     for l in raw:
+        if isinstance(l, tuple) and l[0] == "note":
+            out.append(l)
+            continue
         if isinstance(l, tuple):
             while out and out[-1] == "":
                 out.pop()
@@ -279,8 +330,19 @@ def label_line(s):
 
 def render_body(lines, words):
     """Markdown for the text between headings: paragraphs rejoined, tables kept in code blocks."""
-    lines = clean_lines(lines)
-    out, para = [], []
+    raw, lines, notes_at = clean_lines(lines), [], {}
+    for l in raw:
+        if isinstance(l, tuple):
+            notes_at.setdefault(len(lines), []).append(l[1])
+            lines.append(None)  # the note sat at a page foot: treat it as a page break
+        else:
+            lines.append(l)
+    out, para, pending = [], [], []
+
+    def flush_notes():
+        if pending:
+            out.append("\n".join("> " + md_escape(fix_spacing(n)) for n in pending))
+            pending.clear()
 
     def end_para():
         if para:
@@ -293,10 +355,12 @@ def render_body(lines, words):
             text = fix_spacing(squash(text))
             out.append(md_escape(text))
             para.clear()
+            flush_notes()
 
     real = [l for l in lines if l]
+    special = [bool(l) and (DEFINITION.match(l) is not None or LEADERS.search(l) is not None) for l in lines]
     indent = min((len(l) - len(l.lstrip()) for l in real), default=0)
-    tab = [bool(l) and tabular(l) for l in lines]
+    tab = [bool(l) and not special[k] and tabular(l) for k, l in enumerate(lines)]
     in_table = list(tab)
     idx = [i for i, t in enumerate(tab) if t]
     for a, b in zip(idx, idx[1:]):
@@ -307,6 +371,10 @@ def render_body(lines, words):
     i = 0
     while i < len(lines):
         l = lines[i]
+        if i in notes_at:
+            pending.extend(notes_at[i])
+            if not para:
+                flush_notes()
         if in_table[i]:
             end_para()
             j = i
@@ -328,12 +396,19 @@ def render_body(lines, words):
                 end_para()
         elif l == "":
             end_para()
+        elif special[i] and LEADERS.search(l):
+            # a fee or schedule line with dot leaders: one line each
+            end_para()
+            para.append(LEADERS.sub(" . . . ", l.strip()))
+            end_para()
         else:
-            if para and label_line(l):
+            dm = DEFINITION.match(l)
+            if para and (label_line(l) or dm):
                 end_para()
-            para.append(l.strip())
+            para.append(f"{dm.group(1)}: {dm.group(2)}" if dm else l.strip())
         i += 1
     end_para()
+    flush_notes()
     return "\n\n".join(out)
 
 
@@ -481,7 +556,7 @@ def render_schedule(tag, lines, meta, retrieved, name=None):
     for l in lines:
         if isinstance(l, tuple):
             kept.append(l)
-            page_start = True
+            page_start = page_start or l[0] == "page"
             continue
         key = squash(l)
         if page_start:
@@ -523,8 +598,14 @@ def main(argv):
     meta["words"] = Words(alltext)
     stats = collections.Counter()
     toc, reserved = [], []
+    word_file = os.path.join(ROOT, "tools", "word-titles.txt")
+    word = set()
+    if os.path.exists(word_file):
+        word = {int(x) for x in open(word_file).read().split() if x.isdigit()}
     for t in sorted(meta["titles"]):
         tfolder = f"Title-{t:02d}-{slug(meta['titles'][t])}"
+        if t in word:
+            stats["word"] += 1
         toc += ["", f"### Title {t}: {meta['titles'][t]}", "", "| Chapter | Name |", "| --- | --- |"]
         for ch in [c for c in chapters if c["title"] == t]:
             num = f"{t}-{ch['n']}"
@@ -552,12 +633,14 @@ def main(argv):
                 for top, ls in ch["schedules"].items():
                     rel = f"{tfolder}/{base}-Schedules/Sch-{roman(top):02d}.md"
                     text, sname = render_schedule(top, ls, meta, retrieved, names.get(top))
-                    write(os.path.join(ROOT, rel), text, stats)
+                    if t not in word:
+                        write(os.path.join(ROOT, rel), text, stats)
                     label = f"Schedule {top}" + (f": {sname}" if sname else "")
                     links.append(f"- [{label}]({base}-Schedules/Sch-{roman(top):02d}.md)")
                     toc.append(f"| [11-1-5 Sch. {top}]({rel}) | {sname or ''} |")
             rel = f"{tfolder}/{base}.md"
-            write(os.path.join(ROOT, rel), render_chapter(ch, meta, retrieved, links), stats)
+            if t not in word:  # titles taken from Municode's Word download are left alone
+                write(os.path.join(ROOT, rel), render_chapter(ch, meta, retrieved, links), stats)
             toc.insert(len(toc) - len(links), f"| [{num}]({rel}) | {title_case(ch['name'])} |")
     readme = [
         "# Naperville Municipal Code",
@@ -570,12 +653,16 @@ def main(argv):
         "- **Layout:** one folder per title and one file per chapter. Chapter numbers are padded with zeros so files sort in order (`1-09.md` is Chapter 1-9, and `8-00.5.md` is Chapter 8-0.5). Lettered parts of a chapter (Article 6A, Chapter 9A and so on) are headings inside the chapter's file.",
         "- **Traffic schedules:** the 31 schedules of Section 11-1-5 are kept one per file in `Title-11-Motor-Vehicles-and-Traffic/11-01-Schedules/`, because together they run about 260 pages.",
         "- **Each file** starts with its citation, source, the supplement it reflects and the date the text was downloaded.",
-        "- **How the text was made:** it was extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.",
+        ("- **Word downloads:** Title" + ("s " if len(word) > 1 else " ") + ", ".join(str(w) for w in sorted(word))
+         + " come" + ("" if len(word) > 1 else "s") + " from Municode's online text, downloaded as Word, which is born-digital, so it has no OCR errors. Its files say so in `current_through`, keep Municode's tables and footnotes, and show its figures from the title's `images/` folder. To update "
+         + ("them" if len(word) > 1 else "it") + ", run `tools/municode_word_import.py <file> <date downloaded>` on a fresh download.") if word else None,
+        "- **How the text was made:** " + ("the other titles were" if word else "it was") + " extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.",
         "- **Scanned pages:** many pages of Municode's PDF are scans of the 2010 printing with a machine-read (OCR) text layer, so some words in this copy may be misread. Where a passage matters, check it against the official code.",
         "- **Updating:** download the full code from Municode as a PDF and run `tools/municode_import.py <file> <date downloaded>` (needs `pdftotext`). It rewrites only the chapters whose text changed and this page.",
         "",
         "## Contents",
     ] + toc
+    readme = [r for r in readme if r is not None]
     with open(os.path.join(ROOT, "README.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(readme) + "\n")
     print(f"Supplement {meta['supplement']}, through Ord. {meta['ordinance']} ({meta['adopted']})")
