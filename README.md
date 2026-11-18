@@ -4,12 +4,13 @@ An unofficial copy of the Municipal Code of the City of Naperville, Illinois, ke
 
 **The official text controls.** This copy is for reference only. The official code is published by Municode at [library.municode.com](https://library.municode.com/il/naperville/codes/code_of_ordinances).
 
-- **Current through:** Supplement No. 100 (June 2026), which includes ordinances through Ord. No. 26-040, adopted April 21, 2026.
+- **Current through:** Supplement No. 101 (Ord. 26-049) for the titles from Municode's Word download, and Supplement No. 100 (June 2026), which includes ordinances through Ord. No. 26-040, adopted April 21, 2026, for Title 2.
+- **Tables:** Municode's [Supplement History Table](Tables/Supplement-History.md) (which supplement codified or omitted each ordinance since 2010) and [Code Comparative Table](Tables/Code-Comparative-Table.md) (the sections each ordinance since June 16, 2009 changed) are in `Tables/`.
 - **Layout:** one folder per title and one file per chapter. Chapter numbers are padded with zeros so files sort in order (`1-09.md` is Chapter 1-9, and `8-00.5.md` is Chapter 8-0.5). Lettered parts of a chapter (Article 6A, Chapter 9A and so on) are headings inside the chapter's file.
 - **Traffic schedules:** the 31 schedules of Section 11-1-5 are kept one per file in `Title-11-Motor-Vehicles-and-Traffic/11-01-Schedules/`, because together they run about 260 pages.
 - **Each file** starts with its citation, source, the supplement it reflects and the date the text was downloaded.
 - **Word downloads:** Titles 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 come from Municode's online text, downloaded as Word, which is born-digital, so it has no OCR errors. Its files say so in `current_through`, keep Municode's tables and footnotes, and show its figures from the title's `images/` folder. To update them, run `tools/municode_word_import.py <file> <date downloaded>` on a fresh download.
-- **How the text was made:** Title 2 was extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.
+- **How the text was made:** Title 2 was extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, tables and Index. No wording was changed.
 - **Updating:** download the full code from Municode as a PDF and run `tools/municode_import.py <file> <date downloaded>` (needs `pdftotext`). It rewrites only the chapters whose text changed and this page.
 
 ## Contents

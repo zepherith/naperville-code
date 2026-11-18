@@ -647,6 +647,8 @@ def main(argv):
                 write(os.path.join(ROOT, rel), render_chapter(ch, meta, retrieved, links), stats)
             toc.insert(len(toc) - len(links), f"| [{num}]({rel}) | {title_case(ch['name'])} |")
     pdf_titles = set(meta["titles"]) - word
+    edition_file = os.path.join(ROOT, "tools", "word-edition.txt")
+    word_edition = open(edition_file).read().strip() if os.path.exists(edition_file) else ""
     pdf_label = ("Title " if len(pdf_titles) == 1 else "Titles ") + ", ".join(str(t) for t in sorted(pdf_titles))
     readme = [
         "# Naperville Municipal Code",
@@ -655,14 +657,17 @@ def main(argv):
         "",
         f"**The official text controls.** This copy is for reference only. The official code is published by Municode at [library.municode.com]({SOURCE}).",
         "",
-        f"- **Current through:** Supplement No. {meta['supplement']} ({meta['supplement_date']}), which includes ordinances through Ord. No. {meta['ordinance']}, adopted {meta['adopted']}.",
+        (f"- **Current through:** {word_edition} for the titles from Municode's Word download, and " if word_edition and word else "- **Current through:** ")
+        + f"Supplement No. {meta['supplement']} ({meta['supplement_date']}), which includes ordinances through Ord. No. {meta['ordinance']}, adopted {meta['adopted']}"
+        + (f", for {pdf_label}." if word_edition and word else "."),
+        "- **Tables:** Municode's [Supplement History Table](Tables/Supplement-History.md) (which supplement codified or omitted each ordinance since 2010) and [Code Comparative Table](Tables/Code-Comparative-Table.md) (the sections each ordinance since June 16, 2009 changed) are in `Tables/`." if os.path.isdir(os.path.join(ROOT, "Tables")) else None,
         "- **Layout:** one folder per title and one file per chapter. Chapter numbers are padded with zeros so files sort in order (`1-09.md` is Chapter 1-9, and `8-00.5.md` is Chapter 8-0.5). Lettered parts of a chapter (Article 6A, Chapter 9A and so on) are headings inside the chapter's file.",
         "- **Traffic schedules:** the 31 schedules of Section 11-1-5 are kept one per file in `Title-11-Motor-Vehicles-and-Traffic/11-01-Schedules/`, because together they run about 260 pages.",
         "- **Each file** starts with its citation, source, the supplement it reflects and the date the text was downloaded.",
         ("- **Word downloads:** Title" + ("s " if len(word) > 1 else " ") + ", ".join(str(w) for w in sorted(word))
          + " come" + ("" if len(word) > 1 else "s") + " from Municode's online text, downloaded as Word, which is born-digital, so it has no OCR errors. Its files say so in `current_through`, keep Municode's tables and footnotes, and show its figures from the title's `images/` folder. To update "
          + ("them" if len(word) > 1 else "it") + ", run `tools/municode_word_import.py <file> <date downloaded>` on a fresh download.") if word else None,
-        "- **How the text was made:** " + (pdf_label + " " + ("was" if len(pdf_titles) == 1 else "were") if word else "it was") + " extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, Code Comparative Table and Index. No wording was changed.",
+        "- **How the text was made:** " + (pdf_label + " " + ("was" if len(pdf_titles) == 1 else "were") if word else "it was") + " extracted from Municode's PDF of the code. Wrapped lines were rejoined into paragraphs, tables and schedules were kept in fixed-width blocks, footnotes from the foot of a page were moved below the paragraph they interrupt (shown as quoted notes), and running page headers and footers were removed, along with the supplement sheets, tables and Index. No wording was changed.",
         None if not pdf_titles - DIGITAL_TITLES else "- **Scanned pages:** many pages of Municode's PDF are scans of the 2010 printing with a machine-read (OCR) text layer, so some words in this copy may be misread. Where a passage matters, check it against the official code.",
         "- **Updating:** download the full code from Municode as a PDF and run `tools/municode_import.py <file> <date downloaded>` (needs `pdftotext`). It rewrites only the chapters whose text changed and this page.",
         "",
